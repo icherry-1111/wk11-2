@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>동사 쑥쑥! 그림 상황 글쓰기 놀이터</title>
+    <style>
+        :root {
+            --primary: #FF6B6B;
+            --secondary: #4D96FF;
+            --accent: #FFD93D;
+            --success: #6BCB77;
+            --background: #F4F7FC;
+            --text: #2D3748;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Jua', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            align-items: center;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: var(--primary);
+            font-size: 2.2rem;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 0px #FFE3E3;
+        }
+
+        p.subtitle {
+            color: #718096;
+            font-size: 1.1rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 650px;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* 3단계 선택 네비게이션 */
+        .stage-nav {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .stage-btn {
+            background: #EDF2F7;
+            border: none;
+            padding: 14px 8px;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #A0AEC0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .stage-btn.active {
+            background: var(--secondary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(77, 150, 255, 0.3);
+        }
+
+        /* 카드 영역 */
+        .card-box {
+            background: #FFFDF0;
+            border: 3px dashed #FFE066;
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .emoji-scene-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            background: #FFFFFF;
+            padding: 20px 30px;
+            border-radius: 24px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+            width: 100%;
+            min-height: 140px;
+        }
+
+        .emoji-item {
+            font-size: 3.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .emoji-item.action-focus {
+            font-size: 4.8rem;
+            animation: pulse 1.2s infinite ease-in-out;
+        }
+
+        .text-only-scene {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #EDF2F7;
+            border: 2px dashed #CBD5E0;
+            padding: 25px;
+            border-radius: 20px;
+            width: 100%;
+            font-size: 1.5rem;
+            color: #2D3748;
+            min-height: 120px;
+            word-break: keep-all;
+            font-weight: bold;
+        }
+
+        .situation-title {
+            font-size: 1.3rem;
+            color: var(--text);
+            word-break: keep-all;
+        }
+
+        .verb-badge-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 5px;
+        }
+
+        .verb-badge {
+            background: #EBF8FF;
+            color: #2B6CB0;
+            border: 2px solid #BEE3F8;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .verb-badge:hover {
+            background: #BEE3F8;
+            transform: scale(1.05);
+        }
+
+        /* 입력 및 힌트 영역 */
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .hint-text {
+            font-size: 1.1rem;
+            color: #4A5568;
+            background: #EDF2F7;
+            padding: 12px 18px;
+            border-radius: 12px;
+            border-left: 5px solid var(--accent);
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 16px;
+            font-size: 1.3rem;
+            border: 2px solid #CBD5E0;
+            border-radius: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+            text-align: center;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--primary);
+        }
+
+        /* 결과/피드백 영역 */
+        .feedback {
+            text-align: center;
+            font-size: 1.25rem;
+            font-weight: bold;
+            padding: 15px;
+            border-radius: 14px;
+            display: none;
+        }
+
+        .feedback.success {
+            background: #E6F4EA;
+            color: var(--success);
+            display: block;
+            animation: bounce 0.5s ease;
+        }
+
+        .feedback.error {
+            background: #FCE8E6;
+            color: var(--primary);
+            display: block;
+        }
+
+        /* 하단 진행상황 */
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95rem;
+            color: #718096;
+            border-top: 2px solid #EDF2F7;
+            padding-top: 15px;
+        }
+
+        .next-btn {
+            background: none;
+            border: none;
+            color: var(--secondary);
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-8px);}
+            60% {transform: translateY(-4px);}
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header>
+        <h1>🏃‍♂️ 신나는 동사(Verb) 글쓰기 놀이터 🎨</h1>
+        <p class="subtitle">글자를 입력하면 자동으로 정답이 확인돼요!</p>
+    </header>
+
+    <div class="container">
+        <!-- 3단계 선택 네비게이션 -->
+        <div class="stage-nav">
+            <button class="stage-btn active" onclick="changeStage(0)">1단계<br>단어 작성하기</button>
+            <button class="stage-btn" onclick="changeStage(1)">2단계<br>이모지 보고 문장 쓰기</button>
+            <button class="stage-btn" onclick="changeStage(2)">3단계<br>글만 보고 문장 쓰기</button>
+        </div>
+
+        <!-- 상황 제시 카드 -->
+        <div class="card-box">
+            <div id="displayArea"></div>
+            <div id="situationTitle" class="situation-title">알맞은 단어를 적어보세요!</div>
+            <div id="verbBadgeGroup" class="verb-badge-group"></div>
+        </div>
+
+        <!-- 입력 및 힌트 영역 -->
+        <div class="input-section">
+            <div id="hintText" class="hint-text">💡 힌트 영역</div>
+            <!-- 입력할 때마다 실시간으로 정답 체크 -->
+            <input type="text" id="userInput" placeholder="여기에 영어로 적어보세요!" autocomplete="off" oninput="checkRealtimeAnswer()">
+        </div>
+
+        <!-- 실시간 피드백 창 -->
+        <div id="feedbackBox" class="feedback"></div>
+
+        <!-- 하단 진행 상황 -->
+        <div class="progress-bar">
+            <span id="progressText">1단계 - 문제 1 / 4</span>
+            <button class="next-btn" onclick="nextQuestion()">다음 문제 ➡</button>
+        </div>
+    </div>
+
+    <script>
+        const curriculum = [
+            // 1단계: 그림 보고 단어 작성하기 (초성/앞글자 힌트 적용)
+            [
+                { type: "emoji", emojis: [{ char: "👦", type: "normal" }, { char: "🏃‍♂️", type: "action" }, { char: "🌳", type: "normal" }], title: "달리는 행동을 영어로 써보세요.", hint: "💡 초성 힌트: r _ n", answer: "run", words: ["run", "walk"] },
+                { type: "emoji", emojis: [{ char: "👧", type: "normal" }, { char: "🏊‍♀️", type: "action" }, { char: "🌊", type: "normal" }], title: "헤엄치는 행동을 영어로 써보세요.", hint: "💡 초성 힌트: s _ i _", answer: "swim", words: ["swim", "jump"] },
+                { type: "emoji", emojis: [{ char: "🐱", type: "normal" }, { char: "😴", type: "action" }, { char: "🛏️", type: "normal" }], title: "자는 행동을 영어로 써보세요.", hint: "💡 초성 힌트: s _ e _ p", answer: "sleep", words: ["sleep", "sit"] },
+                { type: "emoji", emojis: [{ char: "🎤", type: "normal" }, { char: "🎶", type: "action" }, { char: "👧", type: "normal" }], title: "노래하는 행동을 영어로 써보세요.", hint: "💡 초성 힌트: s _ n _", answer: "sing", words: ["sing", "dance"] }
+            ],
+            // 2단계: 이모지만 보고 문장 쓰기 (앞글자 힌트 적용)
+            [
+                { type: "emoji", emojis: [{ char: "👦", type: "normal" }, { char: "🏃‍♂️", type: "action" }, { char: "💨", type: "normal" }], title: "이모지 상황을 보고 문장으로 적어보세요.", hint: "💡 힌트: H _ _ r _ _ s", answer: ["he runs", "he run"], words: ["He", "runs"] },
+                { type: "emoji", emojis: [{ char: "👧", type: "normal" }, { char: "📖", type: "action" }, { char: "📚", type: "normal" }], title: "이모지 상황을 보고 문장으로 적어보세요.", hint: "💡 힌트: S _ _ r _ _ d s _ b _ _ k", answer: ["she reads a book", "she read a book"], words: ["She", "reads", "a book"] },
+                { type: "emoji", emojis: [{ char: "🐱", type: "normal" }, { char: "🥛", type: "action" }, { char: "😋", type: "normal" }], title: "이모지 상황을 보고 문장으로 적어보세요.", hint: "💡 힌트: T _ _ c _ _ d _ _ _ k s m _ _ k", answer: ["the cat drinks milk", "cat drinks milk"], words: ["The cat", "drinks", "milk"] },
+                { type: "emoji", emojis: [{ char: "🚴‍♂️", type: "action" }, { char: "🌳", type: "normal" }, { char: "☀️", type: "normal" }], title: "이모지 상황을 보고 문장으로 적어보세요.", hint: "💡 힌트: I r _ _ e _ b _ _ e", answer: ["i ride a bike", "i ride bike"], words: ["I", "ride", "a bike"] }
+            ],
+            // 3단계: 글만 보고 문장 쓰기 (앞글자 힌트 적용)
+            [
+                { type: "text", text: "소년이 공을 찬다", title: "위 문장을 영어로 작성해 보세요.", hint: "💡 힌트: H _ k _ _ _ a b _ _ l", answer: ["he kicks a ball", "he kicks ball", "a boy kicks a ball"], words: ["He", "kicks", "a ball"] },
+                { type: "text", text: "요리사가 요리를 한다", title: "위 문장을 영어로 작성해 보세요.", hint: "💡 힌트: S _ _ c _ _ k _ f _ _ d", answer: ["she cooks food", "she cooks", "the chef cooks food"], words: ["She", "cooks", "food"] },
+                { type: "text", text: "손을 씻는다", title: "위 문장을 영어로 작성해 보세요.", hint: "💡 힌트: I w _ _ h m _ h _ n d _", answer: ["i wash my hands", "i wash hands", "wash hands"], words: ["I", "wash", "my hands"] },
+                { type: "text", text: "강아지가 잔다", title: "위 문장을 영어로 작성해 보세요.", hint: "💡 힌트: T _ _ d _ _ s l _ _ p s", answer: ["the dog sleeps", "dog sleeps", "a dog sleeps"], words: ["The dog", "sleeps"] }
+            ]
+        ];
+
+        let currentStage = 0;
+        let currentIndex = 0;
+
+        function loadQuestion() {
+            const data = curriculum[currentStage][currentIndex];
+            const displayArea = document.getElementById('displayArea');
+            displayArea.innerHTML = '';
+
+            if (data.type === "emoji") {
+                const container = document.createElement('div');
+                container.className = 'emoji-scene-container';
+                data.emojis.forEach(item => {
+                    const span = document.createElement('span');
+                    span.className = `emoji-item ${item.type === 'action' ? 'action-focus' : ''}`;
+                    span.innerText = item.char;
+                    container.appendChild(span);
+                });
+                displayArea.appendChild(container);
+            } else if (data.type === "text") {
+                const textDiv = document.createElement('div');
+                textDiv.className = 'text-only-scene';
+                textDiv.innerText = data.text;
+                displayArea.appendChild(textDiv);
+            }
+
+            document.getElementById('situationTitle').innerText = data.title;
+            document.getElementById('hintText').innerHTML = data.hint;
+            document.getElementById('userInput').value = '';
+            document.getElementById('feedbackBox').style.display = 'none';
+            document.getElementById('progressText').innerText = `${currentStage + 1}단계 - 문제 ${currentIndex + 1} / ${curriculum[currentStage].length}`;
+
+            const badgeGroup = document.getElementById('verbBadgeGroup');
+            badgeGroup.innerHTML = '';
+            data.words.forEach(word => {
+                const badge = document.createElement('span');
+                badge.className = 'verb-badge';
+                badge.innerText = `👉 ${word}`;
+                badge.onclick = () => appendWord(word);
+                badgeGroup.appendChild(badge);
+            });
+        }
+
+        function appendWord(word) {
+            const input = document.getElementById('userInput');
+            if (input.value.trim() === '') {
+                input.value = word;
+            } else {
+                input.value += ' ' + word;
+            }
+            input.focus();
+            checkRealtimeAnswer(); // 단어 칩을 누를 때도 실시간 검사
+        }
+
+        function changeStage(stageIndex) {
+            currentStage = stageIndex;
+            currentIndex = 0;
+            
+            const buttons = document.querySelectorAll('.stage-btn');
+            buttons.forEach((btn, idx) => {
+                btn.classList.toggle('active', idx === stageIndex);
+            });
+
+            loadQuestion();
+        }
+
+        // 입력할 때마다 글자가 맞는지 실시간으로 판단
+        function checkRealtimeAnswer() {
+            const userInput = document.getElementById('userInput').value.trim().toLowerCase().replace(/[.,!]/g, '');
+            const currentData = curriculum[currentStage][currentIndex];
+            const feedbackBox = document.getElementById('feedbackBox');
+
+            if (!userInput) {
+                feedbackBox.style.display = 'none';
+                return;
+            }
+
+            let isCorrect = false;
+            if (Array.isArray(currentData.answer)) {
+                isCorrect = currentData.answer.includes(userInput);
+            } else {
+                isCorrect = (userInput === currentData.answer.toLowerCase());
+            }
+
+            if (isCorrect) {
+                feedbackBox.className = 'feedback success';
+                feedbackBox.innerHTML = '🎉 정답이에요! 아주 훌륭해요 ⭐️ (다음 문제로 넘어가세요!)';
+            } else {
+                // 아직 글자를 다 안 적었거나 틀린 경우 조용히 넘어가거나 안내
+                feedbackBox.style.display = 'none';
+            }
+        }
+
+        function nextQuestion() {
+            currentIndex++;
+            if (currentIndex >= curriculum[currentStage].length) {
+                currentIndex = 0;
+                alert('🎉 축하합니다! 이 단계의 학습을 모두 마쳤습니다!');
+                if (currentStage < curriculum.length - 1) {
+                    changeStage(currentStage + 1);
+                    return;
+                }
+            }
+            loadQuestion();
+        }
+
+        window.onload = function() {
+            loadQuestion();
+        };
+    </script>
+</body>
+</html>
